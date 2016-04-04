@@ -1,0 +1,7 @@
+tag_subtag_browsing.settings:
+ type: config_object
+ label: 'Selected taxonomy for Better Browsing With Tags and Subtags Form.'
+ mapping:
+   browsing_tag:
+     type: text
+     label: 'Select taxonomy'

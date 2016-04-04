@@ -1,0 +1,6 @@
+{
+    "name": "drupal/tag_subtag_browsing",
+    "description": "Better Browsing With Tags and Subtags",
+    "type": "drupal-module",
+    "license": "GPL-2.0+"
+}

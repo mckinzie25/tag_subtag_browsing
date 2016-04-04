@@ -1,0 +1,7 @@
+tag_subtag_browsing.settings:
+  path: '/admin/config/content/tag_subtag_browsing'
+  defaults:
+    _form: 'Drupal\tag_subtag_browsing\Form\TagSubtagBrowsingSettingsForm'
+    _title: 'Better Browsing With Tags and Subtags Configuration Form'
+  requirements:
+    _permission: 'administer site configuration'       

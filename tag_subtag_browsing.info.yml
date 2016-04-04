@@ -1,0 +1,8 @@
+name: Better Browsing With Tags and Subtags
+type: module
+description: 'Allows user to browse nodes by categories and subcategories.  A block will be created containing a select box for users to select a top-level category; based on the category selected, a second select box will be populated with subcategories to select.'
+package: WebMechanic
+version: 1.0
+dependencies:
+    - block
+core: 8.x
