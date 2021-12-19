@@ -10,8 +10,8 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * TagSubtagBrowsingForm form.
- * 
- * This form will appear in 
+ *
+ * This form will appear in
  * Drupal\tag_subtag_browsing\Plugin\Block\TagSubtagBrowsingBlock
  */
 class TagSubtagBrowsingForm extends FormBase {
@@ -28,7 +28,7 @@ class TagSubtagBrowsingForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     list($parent_tags, $child_tags) = $this->getTags();
-        
+
     $form['tag_subtag_browsing_container'] = array(
       '#type' => 'container',
     );
@@ -40,7 +40,7 @@ class TagSubtagBrowsingForm extends FormBase {
       '#type' => 'select',
       '#options' => $parent_tags,
     );
-   
+
     //Sets Ajax callback for top-level categories only if $child_tags are
     //available to populate the child-level drop-down box
     if(!empty($child_tags)) {
@@ -52,7 +52,7 @@ class TagSubtagBrowsingForm extends FormBase {
         'event' => 'change',
       );
     }
-   
+
     if(!empty($child_tags)) {
       //On page load, the subcategory selection array needs to contain all the
       //child tags, so when the user selects a top-level category, the child
@@ -64,8 +64,8 @@ class TagSubtagBrowsingForm extends FormBase {
         '#type' => 'select',
         '#options' => $child_tags,
         '#prefix' => '<div id = "child_container">',
-        '#suffix' => '</div>',         
-      );    
+        '#suffix' => '</div>',
+      );
     }
 
     $form['actions']['submit'] = array(
@@ -73,25 +73,25 @@ class TagSubtagBrowsingForm extends FormBase {
       '#value' => $this->t('View Category'),
       '#button_type' => 'primary',
     );
-    
+
     return $form;
   }
-  
+
   /**
    * Ajax callback for TagSubtagBrowsingForm::buildForm.
-   * 
+   *
    * Creates new set of options for subtag_select box from top-level tag that
    * user selected.
    *
    */
   public function showSubTagsAjax(array &$form, FormStateInterface $form_state) {
-    
+
     //Gets user-selected value for top-level category from the $form_state
     //object.
     $parent_tag = $form_state->getValue('tag_select');
-    
+
     list($parent_tags, $child_tags) = $this->getTags();
-    
+
     if($parent_tag == 0) {
       //If the user choose "Select Category," then show all subcategories.
       $subcat_options = $child_tags;
@@ -106,7 +106,7 @@ class TagSubtagBrowsingForm extends FormBase {
       //tag selection box.
       $subcat_options = NULL;
     }
-    
+
     if(isset($subcat_options)) {
       $subcat_options = array('0' => 'Select Subcategory') + $subcat_options;
 
@@ -116,20 +116,20 @@ class TagSubtagBrowsingForm extends FormBase {
         '#type' => 'select',
         '#options' => $subcat_options,
         '#prefix' => '<div id = "child_container">',
-        '#suffix' => '</div>',         
-      );   
+        '#suffix' => '</div>',
+      );
     }
     else {
       $form['tag_subtag_browsing_container']['subtag_select'] = array(
         '#markup' => 'This category does not contain subcategories.',
         '#prefix' => '<div id = "child_container">',
-        '#suffix' => '</div>',         
-      );       
+        '#suffix' => '</div>',
+      );
     }
-    
-    return $form['tag_subtag_browsing_container']['subtag_select'];    
+
+    return $form['tag_subtag_browsing_container']['subtag_select'];
   }
-  
+
   /**
    * {@inheritdoc}
    */
@@ -141,7 +141,7 @@ class TagSubtagBrowsingForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $parent_tag = $form_state->getValue('tag_select');
-    
+
     $child_tag = $form_state->getValue('subtag_select');
 
     //FormState::setRedirect() redirects to the specified route.  The route
@@ -150,50 +150,50 @@ class TagSubtagBrowsingForm extends FormBase {
     if($child_tag != 0) {
       $form_state->setRedirect('entity.taxonomy_term.canonical',
         array('taxonomy_term' => $child_tag)
-      );    
+      );
     }
     else {
       $form_state->setRedirect('entity.taxonomy_term.canonical',
         array('taxonomy_term' => $parent_tag)
-      );    
+      );
     }
-    
+
   }
 
   /**
-   * Helper function to provide arrays for parent-level and child-level 
+   * Helper function to provide arrays for parent-level and child-level
    * categories for the taxonomy selected in the configuration form.
    */
   protected function getTags() {
     $parent_tags = array();
     $child_tags = array();
-  
+
     //Gets taxonomy for select box (this is set in the
-    //config/install/tag_subtag_browsing.settings.yml file or the 
+    //config/install/tag_subtag_browsing.settings.yml file or the
     //configuration form).
     $config = \Drupal::config('tag_subtag_browsing.settings');
-        
+
     $saved_taxonomy = $config->get('browsing_tag');
 
     //Use the Symfony service container to retrieve the terms for the specified
     //taxonomy.
     $container = \Drupal::getContainer();
-    $terms = $container->get('entity.manager')->getStorage('taxonomy_term')->loadTree($saved_taxonomy);
+    $terms = $container->get('entity_type.manager')->getStorage('taxonomy_term')->loadTree($saved_taxonomy);
 
     if (!empty($terms)) {
       //We use two foreach loops here to get parent and child terms separately,
-      //so that we can use the name of the parent tag as the  optgroup label, 
+      //so that we can use the name of the parent tag as the  optgroup label,
       //instead of the parent tag's numerical key.
       foreach($terms as $term) {
         if($term->parents[0] == 0) {
           $parent_tags[$term->tid] = $term->name;
-        }  
+        }
       }
 
       foreach($terms as $term) {
         if($term->parents[0] != 0) {
           $child_tags[$parent_tags[$term->parents[0]]][$term->tid] = $term->name;;
-        }  
+        }
       }
 
       return array(0 => $parent_tags, 1 => $child_tags);
